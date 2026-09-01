@@ -3,11 +3,11 @@ const express = require('express');
 
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Configuración de middleware
 app.use(express.json());
-app.use("/", (req, res) => {
+app.get("/", (req, res) => {
     res.send("Hello, Penguin panel shop!");
 });
 
