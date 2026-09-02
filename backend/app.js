@@ -1,17 +1,29 @@
-// Instalacion de dependencias
+require('dotenv').config();
+
 const express = require('express');
+const connectDB= require('./src/config/database');
 
-
-const app = express();
 const PORT = process.env.PORT || 3000;
+const app = express();
 
-// Configuración de middleware
 app.use(express.json());
-app.get("/", (req, res) => {
-    res.send("Hello, Penguin panel shop!");
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/', (req, res) => {
+    res.send('Hello, Penguin Panel Shop!');
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-})
+// Funcion para iniciar el servidor y conectarse a la base de datos
+async function startServer() {
+    try {
+        await connectDB();
+        app.listen(PORT, () => {
+            console.log(`Server is running on http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error('Error starting server:', error.stack);
+        process.exit(1); // Salir del proceso con un código de error
+    }
+}
 
+startServer();
