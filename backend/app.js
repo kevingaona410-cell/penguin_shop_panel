@@ -29,7 +29,7 @@ app.get('/', (req,res) => {
     res.redirect('/admin/products'); // Redirigir la ruta raíz a /admin/products
 })
 
-app.use('/', productRoutes); // Usar las rutas de productos
+app.use('/admin/products', productRoutes); // Usar las rutas de productos
 
 // Funcion para iniciar el servidor y conectarse a la base de datos
 async function startServer() {

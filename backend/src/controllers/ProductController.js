@@ -20,6 +20,12 @@ function getValidationErrors(error) {
     return Object.values(error.errors).map((item) => item.message);
 }
 
+function createNotFoundError(message) {
+    const error = new Error(message);
+    error.status = 404;
+    return error;
+}
+
 // Controlador para listar productos del admin, ruta GET /admin/products
 async function listProducts(req, res, next) {
     try {
@@ -47,7 +53,10 @@ async function createProduct(req, res, next) {
         if (error.name === 'ValidationError') {
             return res.status(400).render('products/new', {
                 title: 'Crear Producto',
-                product: req.body,
+                product: {
+                    ...req.body,
+                    isActive: req.body.isActive === 'on'
+                },
                 errors: getValidationErrors(error)
             });
         }
@@ -59,13 +68,13 @@ async function createProduct(req, res, next) {
 async function showProduct(req, res, next) {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return next(createnotFoundError('Producto no encontrado'));
+            return next(createNotFoundError('Producto no encontrado'));
         }
 
         const product = await Product.findById(req.params.id).lean();
 
         if (!product) {
-            return next(createnotFoundError('Producto no encontrado'));
+            return next(createNotFoundError('Producto no encontrado'));
         }
 
         res.render('products/show', {title: product.name, product});
@@ -78,13 +87,13 @@ async function showProduct(req, res, next) {
 async function showEditForm(req, res, next) { 
     try{
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return next(createnotFoundError('Producto no encontrado'));
+            return next(createNotFoundError('Producto no encontrado'));
         }
     
         const product = await Product.findById(req.params.id).lean();
 
         if (!product) {
-            return next(createnotFoundError('Producto no encontrado'));
+            return next(createNotFoundError('Producto no encontrado'));
         }
         res.render('products/edit', {title: 'Editar Producto', product, errors: []});
     
@@ -97,15 +106,15 @@ async function showEditForm(req, res, next) {
 async function updateProduct(req, res, next) {
     try { 
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return next(createnotFoundError('Producto no encontrado'));
+            return next(createNotFoundError('Producto no encontrado'));
         }
         
         const productData = getProductData(req.body);
 
-        const product = await Product.findByIdAndUpdate(req.params.id, productData, {new: true, runValidators: true});
+        const product = await Product.findByIdAndUpdate(req.params.id, productData, {returnDocument: 'after', runValidators: true});
 
         if (!product) {
-            return next(createnotFoundError('Producto no encontrado'));
+            return next(createNotFoundError('Producto no encontrado'));
         }
         res.redirect(`/admin/products/${product._id}`);
     
@@ -113,7 +122,11 @@ async function updateProduct(req, res, next) {
         if (error.name === 'ValidationError') {
             return res.status(400).render('products/edit', {
                 title: 'Editar Producto',
-                product: {...req.body, _id: req.params.id},
+                product: {
+                    ...req.body,
+                    _id: req.params.id,
+                    isActive: req.body.isActive === 'on'
+                },
                 errors: getValidationErrors(error)
             });
         }
@@ -125,13 +138,13 @@ async function updateProduct(req, res, next) {
 async function deleteProduct(req, res, next) {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return next(createnotFoundError('Producto no encontrado'));
+            return next(createNotFoundError('Producto no encontrado'));
         }
 
         const product = await Product.findByIdAndDelete(req.params.id);
 
         if (!product) {
-            return next(createnotFoundError('Producto no encontrado'));
+            return next(createNotFoundError('Producto no encontrado'));
         }
 
         res.redirect('/admin/products');
