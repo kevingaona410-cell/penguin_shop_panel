@@ -1,0 +1,151 @@
+// conexión con moongose para la base de datos
+const mongoose = require('mongoose');
+const Product = require('../models/Product'); // importación del modelo de producto
+
+// Controlador para obtener el datos de un producto desde el cuerpo de la solicitud
+function getProductData(body) {
+    return {
+        name: body.name,
+        description: body.description,
+        price: body.price === '' ? undefined : Number(body.price),
+        stock: body.stock === '' ? undefined : Number(body.stock),
+        category: body.category,
+        imageUrl: body.imageUrl?.trim() || null,
+        isActive: body.isActive === 'on'
+    };
+}
+
+// Validación de errores de Mongoose y obtención de mensajes de error
+function getValidationErrors(error) {
+    return Object.values(error.errors).map((item) => item.message);
+}
+
+// Controlador para listar productos del admin, ruta GET /admin/products
+async function listProducts(req, res, next) {
+    try {
+        const products = await Product.find().sort({createdAt: -1}).lean();
+
+        res.render('products/index', {title: 'Productos', products});
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Controlador para mostrar el formulario de creación de producto, ruta GET /admin/products/new
+function showCreateForm(req, res) {
+    res.render('products/new', {title: 'Crear Producto', product: {}, errors: []});
+}
+
+// Controlador para crear un nuevo producto, ruta POST /admin/products
+async function createProduct(req, res, next) {
+    try {
+        const productData = getProductData(req.body);
+        const product = await Product.create(productData);
+        res.redirect(`/admin/products/${product._id}`);
+
+    } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).render('products/new', {
+                title: 'Crear Producto',
+                product: req.body,
+                errors: getValidationErrors(error)
+            });
+        }
+        next(error);
+    }
+}
+
+// Controlador para mostrar los detalles de un producto, ruta GET /admin/products/:id 
+async function showProduct(req, res, next) {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return next(createnotFoundError('Producto no encontrado'));
+        }
+
+        const product = await Product.findById(req.params.id).lean();
+
+        if (!product) {
+            return next(createnotFoundError('Producto no encontrado'));
+        }
+
+        res.render('products/show', {title: product.name, product});
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Controlador para mostrar el formulario de edición de un producto, ruta GET /admin/products/:id/edit
+async function showEditForm(req, res, next) { 
+    try{
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return next(createnotFoundError('Producto no encontrado'));
+        }
+    
+        const product = await Product.findById(req.params.id).lean();
+
+        if (!product) {
+            return next(createnotFoundError('Producto no encontrado'));
+        }
+        res.render('products/edit', {title: 'Editar Producto', product, errors: []});
+    
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Controlador para actualizar un producto, ruta PUT /admin/products/:id
+async function updateProduct(req, res, next) {
+    try { 
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return next(createnotFoundError('Producto no encontrado'));
+        }
+        
+        const productData = getProductData(req.body);
+
+        const product = await Product.findByIdAndUpdate(req.params.id, productData, {new: true, runValidators: true});
+
+        if (!product) {
+            return next(createnotFoundError('Producto no encontrado'));
+        }
+        res.redirect(`/admin/products/${product._id}`);
+    
+    } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).render('products/edit', {
+                title: 'Editar Producto',
+                product: {...req.body, _id: req.params.id},
+                errors: getValidationErrors(error)
+            });
+        }
+        next(error);
+    }
+}
+
+// Controlador para eliminar un producto, ruta DELETE /admin/products/:id
+async function deleteProduct(req, res, next) {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return next(createnotFoundError('Producto no encontrado'));
+        }
+
+        const product = await Product.findByIdAndDelete(req.params.id);
+
+        if (!product) {
+            return next(createnotFoundError('Producto no encontrado'));
+        }
+
+        res.redirect('/admin/products');
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = {
+    listProducts,
+    showCreateForm,
+    createProduct,
+    showProduct,
+    showEditForm,
+    updateProduct,
+    deleteProduct
+};

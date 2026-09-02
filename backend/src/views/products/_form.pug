@@ -1,0 +1,96 @@
+if errors && errors.length > 0
+  section(role="alert")
+    h2 No se pudo guardar el producto
+
+    ul
+      each error in errors
+        li= error
+
+form(action=formAction method="POST")
+  div
+    label(for="name") Nombre
+    input(
+      id="name"
+      name="name"
+      type="text"
+      value=product.name || ''
+      minlength="2"
+      maxlength="100"
+      required
+    )
+
+  div
+    label(for="description") Descripción
+    textarea(
+      id="description"
+      name="description"
+      maxlength="500"
+      required
+    )= product.description || ''
+
+  div
+    label(for="price") Precio
+    input(
+      id="price"
+      name="price"
+      type="number"
+      value=product.price
+      min="0"
+      step="0.01"
+      required
+    )
+
+  div
+    label(for="stock") Stock
+    input(
+      id="stock"
+      name="stock"
+      type="number"
+      value=product.stock
+      min="0"
+      step="1"
+      required
+    )
+
+  div
+    label(for="category") Categoría
+    select(id="category" name="category" required)
+      option(value="") Selecciona una categoría
+      option(
+        value="fish"
+        selected=product.category === 'fish'
+      ) Pescado
+      option(
+        value="ice"
+        selected=product.category === 'ice'
+      ) Hielo
+      option(
+        value="clothing"
+        selected=product.category === 'clothing'
+      ) Ropa
+      option(
+        value="accessories"
+        selected=product.category === 'accessories'
+      ) Accesorios
+
+  div
+    label(for="imageUrl") URL de la imagen
+    input(
+      id="imageUrl"
+      name="imageUrl"
+      type="url"
+      value=product.imageUrl || ''
+    )
+
+  div
+    input(
+      id="isActive"
+      name="isActive"
+      type="checkbox"
+      checked=product.isActive !== false
+    )
+    label(for="isActive") Producto activo
+
+  div
+    button(type="submit")= submitLabel
+    a(href="/admin/products") Cancelar
