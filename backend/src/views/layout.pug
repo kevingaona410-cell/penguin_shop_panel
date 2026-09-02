@@ -1,0 +1,27 @@
+doctype html
+html(lang='es')
+    head
+        meta(charset='UTF-8')
+        meta(
+            name='viewport',
+            content='width=device-width, initial-scale=1.0')
+        link(rel='stylesheet', href='/css/styles.css')
+        title= title ? `${title} | Penguin Shop` : 'Penguin Shop'
+
+    body
+        header.site-header
+            .container
+                nav.site-nav(aria-label='Navegación principal')
+                    a.site-brand(href='/admin') Penguin Shop
+                    ul.nav-links
+                        li
+                            a(href='/admin/products') Productos
+                        li
+                            a(href='/admin/products/new') Crear Producto
+
+        main.container
+            block content
+
+        footer.site-footer
+            .container
+                p &copy; #{new Date().getFullYear()} Penguin Shop

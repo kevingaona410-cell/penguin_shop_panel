@@ -1,0 +1,39 @@
+extends ../layout
+
+block content
+  section
+    h1 Productos
+
+    a(href="/admin/products/new") Crear producto
+
+    if products.length === 0
+      p Todavía no hay productos registrados.
+    else
+      table
+        thead
+          tr
+            th Nombre
+            th Categoría
+            th Precio
+            th Stock
+            th Estado
+            th Acciones
+
+        tbody
+          each product in products
+            tr
+              td= product.name
+              td= product.category
+              td= product.price
+              td= product.stock
+              td= product.isActive ? 'Activo' : 'Inactivo'
+              td
+                a(href=`/admin/products/${product._id}`) Ver
+                | 
+                a(href=`/admin/products/${product._id}/edit`) Editar
+
+                form(
+                  action=`/admin/products/${product._id}?_method=DELETE`
+                  method="POST"
+                )
+                  button(type="submit") Eliminar
