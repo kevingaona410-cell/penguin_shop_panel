@@ -1,39 +1,57 @@
 extends ../layout
 
 block content
-  section
-    h1 Productos
+  section.page-heading.page-heading-row
+    .heading-copy
+      p.eyebrow Catálogo
+      h1 Productos
+      p Administra los artículos que aparecen en Penguin Shop.
+    a.button.button-primary(href='/admin/products/new') + Crear producto
 
-    a(href="/admin/products/new") Crear producto
-
-    if products.length === 0
-      p Todavía no hay productos registrados.
-    else
-      table
-        thead
-          tr
-            th Nombre
-            th Categoría
-            th Precio
-            th Stock
-            th Estado
-            th Acciones
-
-        tbody
-          each product in products
+  if !products || products.length === 0
+    section.empty-state
+      span.empty-icon ◆
+      h2 El catálogo está vacío
+      p Crea el primer producto para empezar a construir tu inventario.
+      a.button.button-secondary(href='/admin/products/new') Crear primer producto
+  else
+    section.data-panel
+      .panel-toolbar
+        div
+          strong Inventario actual
+          span= `${products.length} ${products.length === 1 ? 'producto' : 'productos'}`
+      .table-wrap
+        table.data-table
+          thead
             tr
-              td= product.name
-              td= product.category
-              td= product.price
-              td= product.stock
-              td= product.isActive ? 'Activo' : 'Inactivo'
-              td
-                a(href=`/admin/products/${product._id}`) Ver
-                | 
-                a(href=`/admin/products/${product._id}/edit`) Editar
+              th Producto
+              th Categoría
+              th Precio
+              th Stock
+              th Estado
+              th Acciones
 
-                form(
-                  action=`/admin/products/${product._id}?_method=DELETE`
-                  method="POST"
-                )
-                  button(type="submit") Eliminar
+          tbody
+            each product in products
+              tr
+                td
+                  .item-cell
+                    if product.imageUrl
+                      img.item-thumb(src=product.imageUrl alt='')
+                    else
+                      span.item-thumb.item-thumb-placeholder ◆
+                    .item-name
+                      strong= product.name
+                      small= product.description
+                td
+                  span.category-label= product.category === 'fish' ? 'Pescado' : product.category === 'ice' ? 'Hielo' : product.category === 'clothing' ? 'Ropa' : 'Accesorios'
+                td.numeric= `${Number(product.price || 0).toFixed(2)} €`
+                td.numeric= product.stock
+                td
+                  span.status-badge(class=product.isActive ? 'status-active' : 'status-inactive')= product.isActive ? 'Activo' : 'Inactivo'
+                td.actions
+                  a.text-link(href=`/admin/products/${product._id}`) Ver
+                  a.text-link(href=`/admin/products/${product._id}/edit`) Editar
+                  form(action=`/admin/products/${product._id}?_method=DELETE` method='POST')
+                    input(type='hidden' name='_csrf' value=csrfToken)
+                    button.text-button.text-button-danger(type='submit') Eliminar

@@ -1,10 +1,12 @@
 extends ../layout
 
 block content
-  section
-    h1 Editar producto
+  section.page-heading
+    .heading-copy
+      p.eyebrow Catálogo
+      h1 Editar producto
+      p Actualiza la información del artículo seleccionado.
 
-    - const formAction = `/admin/products/${product._id}?_method=PUT`
-    - const submitLabel = 'Guardar cambios'
-
-    include _form
+  - const formAction = `/admin/products/${product._id}?_method=PUT`
+  - const submitLabel = 'Guardar cambios'
+  include _form

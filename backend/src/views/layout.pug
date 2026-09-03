@@ -2,26 +2,40 @@ doctype html
 html(lang='es')
     head
         meta(charset='UTF-8')
-        meta(
-            name='viewport',
-            content='width=device-width, initial-scale=1.0')
+        meta(name='viewport', content='width=device-width, initial-scale=1.0')
         link(rel='stylesheet', href='/css/styles.css')
         title= title ? `${title} | Penguin Shop` : 'Penguin Shop'
 
-    body
+    body.app-shell
         header.site-header
-            .container
-                nav.site-nav(aria-label='Navegación principal')
-                    a.site-brand(href='/admin') Penguin Shop
-                    ul.nav-links
-                        li
-                            a(href='/admin/products') Productos
-                        li
-                            a(href='/admin/products/new') Crear Producto
+            .container.site-header-inner
+                a.site-brand(href='/admin' aria-label='Ir al panel de administración')
+                    span.brand-mark 🐧
+                    span
+                        strong Penguin Shop
+                        small Hielos y Peces
 
-        main.container
+                nav.site-nav(aria-label='Navegación principal')
+                    a.nav-link(href='/admin') Inicio
+                    a.nav-link(href='/admin/products') Productos
+                    a.nav-link(href='/admin/orders') Pedidos
+
+                if admin
+                    span.admin-user
+                        | Hola, #{admin.username}
+
+                form.logout-form(action='/logout' method='POST')
+                    input(
+                        type='hidden'
+                        name='_csrf'
+                        value=csrfToken
+                    )
+                    button.button.button-quiet(type='submit') Cerrar sesión
+
+        main.container.main-content
             block content
 
         footer.site-footer
             .container
-                p &copy; #{new Date().getFullYear()} Penguin Shop
+                p Penguin Shop
+                span &copy; #{new Date().getFullYear()} · Gestión interna

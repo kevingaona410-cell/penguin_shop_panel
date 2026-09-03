@@ -1,10 +1,12 @@
 extends ../layout
 
 block content
-  section
-    h1 Crear producto
+  section.page-heading
+    .heading-copy
+      p.eyebrow Catálogo
+      h1 Crear producto
+      p Añade un nuevo artículo al inventario de Penguin Shop.
 
-    - const formAction = '/admin/products'
-    - const submitLabel = 'Crear producto'
-
-    include _form
+  - const formAction = '/admin/products'
+  - const submitLabel = 'Crear producto'
+  include _form

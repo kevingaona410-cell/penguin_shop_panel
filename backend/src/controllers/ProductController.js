@@ -1,6 +1,10 @@
 // conexión con moongose para la base de datos
 const mongoose = require('mongoose');
 const Product = require('../models/Product'); // importación del modelo de producto
+const {
+    getValidationErrors,
+    createNotFound
+} = require('../../helpers/errors');
 
 // Controlador para obtener el datos de un producto desde el cuerpo de la solicitud
 function getProductData(body) {
@@ -13,17 +17,6 @@ function getProductData(body) {
         imageUrl: body.imageUrl?.trim() || null,
         isActive: body.isActive === 'on'
     };
-}
-
-// Validación de errores de Mongoose y obtención de mensajes de error
-function getValidationErrors(error) {
-    return Object.values(error.errors).map((item) => item.message);
-}
-
-function createNotFoundError(message) {
-    const error = new Error(message);
-    error.status = 404;
-    return error;
 }
 
 // Controlador para listar productos del admin, ruta GET /admin/products
@@ -68,13 +61,13 @@ async function createProduct(req, res, next) {
 async function showProduct(req, res, next) {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return next(createNotFoundError('Producto no encontrado'));
+            return next(createNotFound('Producto'));
         }
 
         const product = await Product.findById(req.params.id).lean();
 
         if (!product) {
-            return next(createNotFoundError('Producto no encontrado'));
+            return next(createNotFound('Producto'));
         }
 
         res.render('products/show', {title: product.name, product});
@@ -87,13 +80,13 @@ async function showProduct(req, res, next) {
 async function showEditForm(req, res, next) { 
     try{
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return next(createNotFoundError('Producto no encontrado'));
+            return next(createNotFound('Producto'));
         }
     
         const product = await Product.findById(req.params.id).lean();
 
         if (!product) {
-            return next(createNotFoundError('Producto no encontrado'));
+            return next(createNotFound('Producto'));
         }
         res.render('products/edit', {title: 'Editar Producto', product, errors: []});
     
@@ -106,7 +99,7 @@ async function showEditForm(req, res, next) {
 async function updateProduct(req, res, next) {
     try { 
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return next(createNotFoundError('Producto no encontrado'));
+            return next(createNotFound('Producto'));
         }
         
         const productData = getProductData(req.body);
@@ -114,7 +107,7 @@ async function updateProduct(req, res, next) {
         const product = await Product.findByIdAndUpdate(req.params.id, productData, {returnDocument: 'after', runValidators: true});
 
         if (!product) {
-            return next(createNotFoundError('Producto no encontrado'));
+            return next(createNotFound('Producto'));
         }
         res.redirect(`/admin/products/${product._id}`);
     
@@ -138,13 +131,13 @@ async function updateProduct(req, res, next) {
 async function deleteProduct(req, res, next) {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return next(createNotFoundError('Producto no encontrado'));
+            return next(createNotFound('Producto'));
         }
 
         const product = await Product.findByIdAndDelete(req.params.id);
 
         if (!product) {
-            return next(createNotFoundError('Producto no encontrado'));
+            return next(createNotFound('Producto'));
         }
 
         res.redirect('/admin/products');

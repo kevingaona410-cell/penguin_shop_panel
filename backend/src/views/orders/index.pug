@@ -1,0 +1,62 @@
+extends ../layout
+
+block content
+  section.page-heading
+    .heading-copy
+      p.eyebrow Operaciones
+      h1 Pedidos
+      p Sigue cada pedido desde la preparación hasta la entrega.
+
+  if !orders || orders.length === 0
+    section.empty-state
+      span.empty-icon ◎
+      h2 Todavía no hay pedidos
+      p Los pedidos nuevos aparecerán aquí cuando se registren.
+  else
+    section.data-panel
+      .panel-toolbar
+        div
+          strong Actividad reciente
+          span= `${orders.length} ${orders.length === 1 ? 'pedido' : 'pedidos'}`
+      .table-wrap
+        table.data-table
+          thead
+            tr
+              th Cliente
+              th Dirección de entrega
+              th Artículos
+              th Total
+              th Estado
+              th Fecha
+              th Acciones
+
+          tbody
+            each order in orders
+              tr
+                td
+                  .item-cell
+                    span.avatar= order.customerName ? order.customerName.charAt(0).toUpperCase() : '?'
+                    .item-name
+                      strong= order.customerName
+                      small= `Pedido #${String(order._id).slice(-6)}`
+                td= order.deliveryAddress
+                td.numeric= order.items ? order.items.length : 0
+                td.numeric= `${Number(order.total || 0).toFixed(2)} €`
+                td
+                  span.status-badge(class=`status-${order.status || 'unknown'}`)
+                    case order.status
+                      when 'pending'
+                        | Pendiente
+                      when 'preparing'
+                        | Preparando
+                      when 'shipped'
+                        | Enviado
+                      when 'delivered'
+                        | Entregado
+                      when 'cancelled'
+                        | Cancelado
+                      default
+                        = order.status || 'Sin estado'
+                td= order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'
+                td.actions
+                  a.text-link(href=`/admin/orders/${order._id}`) Ver pedido
