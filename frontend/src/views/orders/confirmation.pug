@@ -1,0 +1,24 @@
+extends ../layout
+
+block content
+  h1= title
+
+  if order
+    p Pedido: #{order._id}
+    p Cliente: #{order.customerName}
+    p Dirección: #{order.deliveryAddress}
+    p Estado: #{order.status}
+    p Fecha: #{order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'}
+
+    h2 Productos
+    each item in order.items
+      article
+        h3= item.productName
+        p Cantidad: #{item.quantity}
+        p Precio: #{Number(item.unitPrice || 0).toFixed(2)} €
+        p Subtotal: #{Number(item.subtotal || 0).toFixed(2)} €
+
+    h2 Total: #{Number(order.total || 0).toFixed(2)} €
+
+  a(href='/orders') Ver pedidos
+  a(href='/products') Volver al catálogo

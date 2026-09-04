@@ -1,0 +1,41 @@
+extends ../layout
+
+block content
+    h1= title
+
+    h2 Resumen del pedido
+
+    each item in items
+        article
+            h3= item.product.name
+            p Precio: #{Number(item.product.price).toFixed(2)} €
+            p Cantidad: #{item.quantity}
+            p Subtotal: #{Number(item.subtotal).toFixed(2)} €
+
+    h2 Total: #{Number(total).toFixed(2)} €
+
+    form(action='/orders' method='POST')
+        div
+            label(for='customerName') Nombre del cliente
+            input(
+                type='text'
+                id='customerName'
+                name='customerName'
+                required
+                minlength='2'
+                maxlength='100'
+            )
+
+        div
+            label(for='deliveryAddress') Dirección de entrega
+            textarea(
+                id='deliveryAddress'
+                name='deliveryAddress'
+                required
+                minlength='5'
+                maxlength='250'
+            )
+
+        button(type='submit') Confirmar pedido
+
+    a(href='/cart') Volver al carrito

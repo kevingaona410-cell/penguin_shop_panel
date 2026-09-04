@@ -1,0 +1,18 @@
+extends ../layout
+
+block content
+  h1= title
+
+  if !orders || orders.length === 0
+    p Todavía no tienes pedidos.
+    a(href='/products') Ver catálogo
+  else
+    each order in orders
+      article
+        h2 Pedido ##{order._id}
+        p Fecha: #{order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'}
+        p Total: #{Number(order.total || 0).toFixed(2)} €
+        p Estado: #{order.status}
+        a(href=`/orders/${order._id}`) Ver detalle
+
+  a(href='/products') Volver al catálogo

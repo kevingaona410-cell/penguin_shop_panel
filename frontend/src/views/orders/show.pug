@@ -1,0 +1,54 @@
+extends ../layout
+
+block content
+    h1= title
+
+    h2 Información del pedido
+
+    p
+        strong ID:
+        |  #{order._id}
+
+    p
+        strong Fecha:
+        |  #{order.createdAt}
+
+    p
+        strong Estado:
+        |  #{order.status}
+
+    p
+        strong Cliente:
+        |  #{order.customerName}
+
+    p
+        strong Dirección de entrega:
+        |  #{order.deliveryAddress}
+
+    h2 Productos
+
+    each item in order.items
+        article
+            h3= item.productName
+            p
+                strong Precio unitario:
+                |  #{Number(item.unitPrice).toFixed(2)} €
+            p
+                strong Cantidad:
+                |  #{item.quantity}
+            p
+                strong Subtotal:
+                |  #{Number(item.subtotal).toFixed(2)} €
+
+    h2 Total
+
+    p
+        strong #{Number(order.total).toFixed(2)} €
+
+    if order.status === 'pending' || order.status === 'preparing'
+        form(action=`/orders/${order._id}/cancel` method='POST')
+            input(type='hidden' name='_method' value='PATCH')
+            button(type='submit') Cancelar pedido
+
+    a(href='/orders') Volver a mis pedidos
+    a(href='/products') Seguir comprando

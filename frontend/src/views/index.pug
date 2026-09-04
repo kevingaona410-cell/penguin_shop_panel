@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1= title || 'Penguin Shop'
+
+  p Bienvenido a la tienda. Explora nuestro catálogo y gestiona tu carrito.
+
+  nav
+    a(href='/products') Ver productos
+    a(href='/cart') Ver carrito
