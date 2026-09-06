@@ -18,6 +18,13 @@ block content
         div
           strong Actividad reciente
           span= `${orders.length} ${orders.length === 1 ? 'pedido' : 'pedidos'}`
+        select.table-search#statusFilter(aria-label='Filtrar por estado')
+          option(value='all') Todos los estados
+          option(value='pending') Pendiente
+          option(value='preparing') Preparando
+          option(value='shipped') Enviado
+          option(value='delivered') Entregado
+          option(value='cancelled') Cancelado
       .table-wrap
         table.data-table
           thead
@@ -32,7 +39,7 @@ block content
 
           tbody
             each order in orders
-              tr
+              tr(data-status=order.status)
                 td
                   .item-cell
                     span.avatar= order.customerName ? order.customerName.charAt(0).toUpperCase() : '?'
@@ -60,3 +67,22 @@ block content
                 td= order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'
                 td.actions
                   a.text-link(href=`/admin/orders/${order._id}`) Ver pedido
+      p#noResults.muted(style='display:none; padding:14px 18px;') Sin pedidos con ese estado.
+
+  script.
+    (function () {
+      var select = document.getElementById('statusFilter');
+      var rows = Array.from(document.querySelectorAll('.data-table tbody tr[data-status]'));
+      var empty = document.getElementById('noResults');
+      if (!select || !rows.length) return;
+      select.addEventListener('change', function () {
+        var v = select.value;
+        var visible = 0;
+        rows.forEach(function (r) {
+          var show = v === 'all' || r.dataset.status === v;
+          r.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        if (empty) empty.style.display = visible === 0 ? '' : 'none';
+      });
+    })();

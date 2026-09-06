@@ -51,6 +51,14 @@ app.use(
     })
 );
 
+// Variables globales de vista
+app.use((req, res, next) => {
+    const cart = req.session?.cart || {};
+    res.locals.cartCount = Object.values(cart).reduce((sum, qty) => sum + (Number(qty) || 0), 0);
+    res.locals.currentPath = req.path;
+    next();
+});
+
 // Ruta principal
 app.get('/', (req, res) => {
     res.render('index', { title: 'Penguin Shop' });

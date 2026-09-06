@@ -1,24 +1,24 @@
 extends ../layout
 
 block content
-  h1= title
+  .confirm
+    span.confirm-icon ✓
+    h2 ¡Pedido confirmado!
+    p Gracias por tu compra. Tu pedido ha sido registrado correctamente.
 
-  if order
-    p Pedido: #{order._id}
-    p Cliente: #{order.customerName}
-    p Dirección: #{order.deliveryAddress}
-    p Estado: #{order.status}
-    p Fecha: #{order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'}
+    if order
+      .panel
+        dl.kv
+          dt Número de pedido:
+          dd= order._id
+          dt Fecha:
+          dd= order.createdAt ? new Date(order.createdAt).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'
+          dt Estado:
+          dd
+            - const st = order.status
+            - const stLabel = st === 'pending' ? 'Pendiente' : st === 'preparing' ? 'En preparación' : st === 'shipped' ? 'Enviado' : st === 'delivered' ? 'Entregado' : 'Cancelado'
+            span.badge(class=st)= stLabel
 
-    h2 Productos
-    each item in order.items
-      article
-        h3= item.productName
-        p Cantidad: #{item.quantity}
-        p Precio: #{Number(item.unitPrice || 0).toFixed(2)} €
-        p Subtotal: #{Number(item.subtotal || 0).toFixed(2)} €
-
-    h2 Total: #{Number(order.total || 0).toFixed(2)} €
-
-  a(href='/orders') Ver pedidos
-  a(href='/products') Volver al catálogo
+    .confirm-actions
+      a.btn.btn-primary.btn-auto(href='/orders') Ver mis pedidos
+      a.btn.btn-ghost.btn-auto(href='/products') Seguir comprando

@@ -53,3 +53,27 @@ form.form-card(action=formAction method='POST')
   .form-actions
     a.button.button-secondary(href='/admin/products') Cancelar
     button.button.button-primary(type='submit')= submitLabel
+
+script.
+  (function () {
+    var input = document.getElementById('imageUrl');
+    if (!input) return;
+    var box = document.createElement('div');
+    box.className = 'img-preview';
+    input.parentNode.appendChild(box);
+    function render() {
+      var v = (input.value || '').trim();
+      box.innerHTML = '';
+      if (!v) return;
+      var img = document.createElement('img');
+      img.alt = 'Vista previa del producto';
+      img.onerror = function () { box.textContent = 'No se pudo cargar la imagen'; };
+      img.src = v;
+      var label = document.createElement('span');
+      label.textContent = 'Vista previa';
+      box.appendChild(img);
+      box.appendChild(label);
+    }
+    input.addEventListener('input', render);
+    render();
+  })();

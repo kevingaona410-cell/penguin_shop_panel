@@ -1,21 +1,48 @@
 extends ../layout
 
 block content
-  a(href='/products') ← Volver a productos
+  - const catLabel = product.category === 'fish' ? 'Pescado' : product.category === 'ice' ? 'Hielo' : product.category === 'clothing' ? 'Ropa' : 'Accesorios'
+  - const price = Number(product.price || 0).toFixed(2).replace('.', ',')
 
-  .product-detail
-    if product.imageUrl
-      img.product-image(src=product.imageUrl alt=product.name)
-    else
-      .product-image.placeholder Imagen no disponible
+  .detail
+    .detail-gallery
+      .main-img
+        if product.imageUrl
+          img(src=product.imageUrl, alt=product.name)
+        else
+          span 🐧
+      .thumbs(aria-hidden='true')
+        .thumb.active
+          if product.imageUrl
+            img(src=product.imageUrl, alt='')
+          else
+            span 🐧
+        .thumb
+          span 🧊
+        .thumb
+          span 🎒
+        .thumb
+          span 🐧
 
-    .product-info
-      span.category-badge= product.category === 'fish' ? 'Pescado' : product.category === 'ice' ? 'Hielo' : product.category === 'clothing' ? 'Ropa' : 'Accesorios'
+    .detail-info
       h1= product.name
-      p.price= `${Number(product.price || 0).toFixed(2)} €`
-      p.description= product.description
-      p Stock disponible: #{product.stock}
+      .detail-price
+        span.price= `${price} €`
+        if product.stock > 0
+          span.badge.stock En stock
+        else
+          span.badge.nostock Sin stock
+      p.detail-desc= product.description
+      ul.spec
+        li
+          | • Categoría: 
+          strong= catLabel
+        li
+          | • Stock disponible: 
+          strong= `${product.stock} uds.`
+      .buy-row
+        span.qty-static Cantidad: &nbsp;1
+        form(action=`/cart/add/${product._id}`, method='POST', style='flex:1; display:flex;')
+          button.btn.btn-primary(type='submit', disabled=product.stock <= 0)= product.stock > 0 ? 'Añadir al carrito' : 'Sin stock'
 
-      form(action=`/cart/add/${product._id}` method='POST')
-        button(type='submit' disabled=product.stock <= 0)
-          = product.stock > 0 ? 'Añadir al carrito' : 'Sin stock'
+  a.link-back(href='/products') ← Volver al catálogo

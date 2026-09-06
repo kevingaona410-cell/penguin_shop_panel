@@ -20,6 +20,7 @@ block content
         div
           strong Inventario actual
           span= `${products.length} ${products.length === 1 ? 'producto' : 'productos'}`
+        input.table-search#productSearch(type='search' placeholder='Buscar productos...' aria-label='Buscar productos')
       .table-wrap
         table.data-table
           thead
@@ -33,7 +34,7 @@ block content
 
           tbody
             each product in products
-              tr
+              tr(data-name=(product.name || '').toLowerCase() data-category=product.category)
                 td
                   .item-cell
                     if product.imageUrl
@@ -55,3 +56,22 @@ block content
                   form(action=`/admin/products/${product._id}?_method=DELETE` method='POST')
                     input(type='hidden' name='_csrf' value=csrfToken)
                     button.text-button.text-button-danger(type='submit') Eliminar
+      p#noResults.muted(style='display:none; padding:14px 18px;') Sin resultados para tu búsqueda.
+
+  script.
+    (function () {
+      var input = document.getElementById('productSearch');
+      var rows = Array.from(document.querySelectorAll('.data-table tbody tr[data-name]'));
+      var empty = document.getElementById('noResults');
+      if (!input || !rows.length) return;
+      input.addEventListener('input', function () {
+        var q = input.value.trim().toLowerCase();
+        var visible = 0;
+        rows.forEach(function (r) {
+          var show = !q || (r.dataset.name || '').includes(q);
+          r.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        if (empty) empty.style.display = visible === 0 ? '' : 'none';
+      });
+    })();

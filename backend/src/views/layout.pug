@@ -15,10 +15,13 @@ html(lang='es')
                         strong Penguin Shop
                         small Hielos y Peces
 
+                input#nav-toggle.nav-toggle(type='checkbox')
+                label.hamburger(for='nav-toggle', aria-label='Abrir menú') ☰
+                - const current = typeof currentPath !== 'undefined' ? currentPath : ''
                 nav.site-nav(aria-label='Navegación principal')
-                    a.nav-link(href='/admin') Inicio
-                    a.nav-link(href='/admin/products') Productos
-                    a.nav-link(href='/admin/orders') Pedidos
+                    a.nav-link(href='/admin' class=(current === '/admin' || current === '/admin/' ? 'active' : '')) Inicio
+                    a.nav-link(href='/admin/products' class=(current && current.startsWith('/admin/products') ? 'active' : '')) Productos
+                    a.nav-link(href='/admin/orders' class=(current && current.startsWith('/admin/orders') ? 'active' : '')) Pedidos
 
                 if admin
                     span.admin-user
@@ -37,5 +40,11 @@ html(lang='es')
 
         footer.site-footer
             .container
-                p Penguin Shop
-                span &copy; #{new Date().getFullYear()} · Gestión interna
+                div
+                    p Penguin Shop
+                    span &copy; #{new Date().getFullYear()} · Gestión interna
+                .iceberg(aria-hidden='true')
+                    svg(viewBox='0 0 1200 90', preserveAspectRatio='none')
+                        path(d='M0,60 L90,25 L170,55 L260,20 L340,55 L430,30 L520,58 L610,28 L700,55 L790,22 L880,55 L970,30 L1060,58 L1140,32 L1200,55 L1200,90 L0,90 Z', fill='#bfe0f4')
+                        path(d='M0,72 L120,48 L240,70 L360,50 L480,72 L600,52 L720,72 L840,50 L960,72 L1080,52 L1200,70 L1200,90 L0,90 Z', fill='#d8eefc')
+                        path(d='M0,82 L200,66 L420,80 L640,66 L860,80 L1080,66 L1200,78 L1200,90 L0,90 Z', fill='#eaf6fe')

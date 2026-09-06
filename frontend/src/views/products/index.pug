@@ -1,31 +1,74 @@
 extends ../layout
 
 block content
-  h1= title
+  h1.page-title= title || 'Productos'
+  p.page-sub Explora nuestro catálogo antártico.
+
+  .toolbar
+    .search
+      span.icon 🔍
+      input#searchInput(type='search', placeholder='Buscar productos...', aria-label='Buscar productos')
+    select#categoryFilter.select(aria-label='Filtrar por categoría')
+      option(value='all') Todas las categorías
+      option(value='fish') Pescado
+      option(value='ice') Hielo
+      option(value='clothing') Ropa
+      option(value='accessories') Accesorios
 
   if products && products.length
-    .product-grid
+    .product-grid#productGrid
       each product in products
-        article.product-card
-          if product.imageUrl
-            img.product-image(src=product.imageUrl alt=product.name)
-          else
-            .product-image.placeholder Imagen no disponible
-
-          h2= product.name
-          p= product.description
-
-          .meta
-            span= product.category === 'fish' ? 'Pescado' : product.category === 'ice' ? 'Hielo' : product.category === 'clothing' ? 'Ropa' : 'Accesorios'
-            span= `${Number(product.price || 0).toFixed(2)} €`
-
-          p Stock: #{product.stock}
-
-          .actions
-            a(href=`/products/${product._id}`) Ver detalle
-            form(action=`/cart/add/${product._id}` method='POST')
-              button(type='submit' disabled=product.stock <= 0)
-                = product.stock > 0 ? 'Añadir al carrito' : 'Sin stock'
+        - const catLabel = product.category === 'fish' ? 'Pescado' : product.category === 'ice' ? 'Hielo' : product.category === 'clothing' ? 'Ropa' : 'Accesorios'
+        - const price = Number(product.price || 0).toFixed(2).replace('.', ',')
+        article.product-card(data-name=(product.name || '').toLowerCase(), data-category=product.category)
+          a.thumb(href=`/products/${product._id}`, aria-label=`Ver ${product.name}`)
+            if product.imageUrl
+              img(src=product.imageUrl, alt=product.name, loading='lazy')
+            else
+              span 🐧
+          .info
+            h3
+              a(href=`/products/${product._id}`)= product.name
+            .price-row
+              span.price= `${price} €`
+              if product.stock > 0
+                span.badge.stock En stock
+              else
+                span.badge.nostock Sin stock
+            form(action=`/cart/add/${product._id}`, method='POST')
+              button.btn.btn-primary(type='submit', disabled=product.stock <= 0)= product.stock > 0 ? 'Añadir al carrito' : 'Sin stock'
+    p#noResults.page-sub(style='display:none; margin-top:14px;') Sin resultados para tu búsqueda.
   else
-    p No hay productos disponibles en este momento.
-    a(href='/') Volver al inicio
+    .empty
+      span.big 🐧
+      p No hay productos disponibles en este momento.
+      a.btn.btn-ghost.btn-auto(href='/') Volver al inicio
+
+  script.
+    (function () {
+      const input = document.getElementById('searchInput');
+      const select = document.getElementById('categoryFilter');
+      const grid = document.getElementById('productGrid');
+      if (!grid) return;
+      const cards = Array.from(grid.querySelectorAll('.product-card'));
+      const empty = document.getElementById('noResults');
+      const params = new URLSearchParams(window.location.search);
+      const initialCat = params.get('category');
+      if (initialCat && select) select.value = initialCat;
+      function apply() {
+        const q = (input ? input.value : '').trim().toLowerCase();
+        const cat = select ? select.value : 'all';
+        let visible = 0;
+        cards.forEach((c) => {
+          const okQ = !q || (c.dataset.name || '').includes(q);
+          const okC = cat === 'all' || c.dataset.category === cat;
+          const show = okQ && okC;
+          c.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        if (empty) empty.style.display = visible === 0 ? '' : 'none';
+      }
+      if (input) input.addEventListener('input', apply);
+      if (select) select.addEventListener('change', apply);
+      apply();
+    })();

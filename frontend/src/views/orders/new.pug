@@ -1,30 +1,16 @@
 extends ../layout
 
 block content
-  h1= title
+  h1.page-title= title || 'Nuevo pedido'
+  p.page-sub Introduce tus datos de entrega.
 
-  form(action='/orders' method='POST')
-    div
+  form(action='/orders', method='POST')
+    .field
       label(for='customerName') Nombre del cliente
-      input(
-        type='text'
-        id='customerName'
-        name='customerName'
-        required
-        minlength='2'
-        maxlength='100'
-      )
-
-    div
+      input#customerName(type='text', name='customerName', required, minlength='2', maxlength='100', placeholder='Juan Pérez')
+    .field
       label(for='deliveryAddress') Dirección de entrega
-      textarea(
-        id='deliveryAddress'
-        name='deliveryAddress'
-        required
-        minlength='5'
-        maxlength='250'
-      )
-
-    button(type='submit') Continuar
-
-  a(href='/cart') Volver al carrito
+      textarea#deliveryAddress(name='deliveryAddress', required, minlength='5', maxlength='250', placeholder='Calle del Sol 123, Madrid')
+    .cart-footer
+      a.link-back(href='/cart', style='margin-top:0;') ← Volver al carrito
+      button.btn.btn-primary.btn-auto(type='submit') Continuar

@@ -1,35 +1,71 @@
 extends ../layout
 
 block content
-  h1= title
+  h1.page-title= title || 'Tu carrito'
 
   if !items || items.length === 0
-    p Tu carrito está vacío.
-    a(href='/products') Ver productos
+    .empty
+      span.big 🛒
+      p Tu carrito está vacío.
+      a.btn.btn-primary.btn-auto(href='/products') Ver productos
   else
-    .cart-list
-      each item in items
-        article.cart-item
-          h2= item.product.name
-          p Precio unitario: #{Number(item.product.price || 0).toFixed(2)} €
-          p Cantidad: #{item.quantity}
-          p Subtotal: #{Number(item.subtotal || 0).toFixed(2)} €
+    .table-wrap
+      table.table
+        thead
+          tr
+            th Producto
+            th Precio unitario
+            th Cantidad
+            th Subtotal
+            th Acciones
+        tbody
+          each item in items
+            - const unit = Number(item.product.price || 0).toFixed(2).replace('.', ',')
+            - const sub = Number(item.subtotal || 0).toFixed(2).replace('.', ',')
+            tr
+              td(data-label='Producto')
+                .cell-product
+                  span.mini
+                    if item.product.imageUrl
+                      img(src=item.product.imageUrl, alt=item.product.name)
+                    else
+                      | 🐧
+                  span= item.product.name
+              td(data-label='Precio unitario')= `${unit} €`
+              td(data-label='Cantidad')
+                form(action=`/cart/update/${item.product._id}`, method='POST', style='display:inline;')
+                  input(type='hidden', name='_method', value='PUT')
+                  span.qty
+                    button(type='button', data-step='-1', aria-label='Disminuir cantidad') −
+                    input(type='number', name='quantity', value=item.quantity, min='1', max=item.product.stock, aria-label='Cantidad')
+                    button(type='button', data-step='1', aria-label='Aumentar cantidad') +
+              td(data-label='Subtotal')= `${sub} €`
+              td(data-label='Acciones')
+                form(action=`/cart/remove/${item.product._id}`, method='POST', style='display:inline;')
+                  input(type='hidden', name='_method', value='DELETE')
+                  button.btn-danger-link(type='submit') 🗑 Eliminar
 
-          form(action=`/cart/update/${item.product._id}` method='POST')
-            input(type='hidden' name='_method' value='PUT')
-            label(for=`quantity-${item.product._id}`) Cantidad
-            input(id=`quantity-${item.product._id}` type='number' name='quantity' value=item.quantity min='1' max=item.product.stock)
-            button(type='submit') Actualizar
+    .cart-footer
+      form(action='/cart/clear', method='POST')
+        input(type='hidden', name='_method', value='DELETE')
+        button.btn.btn-ghost.btn-auto(type='submit') 🗑 Vaciar carrito
+      .total-line Total: <span class='amount'>#{Number(total || 0).toFixed(2).replace('.', ',')} €</span>
 
-          form(action=`/cart/remove/${item.product._id}` method='POST')
-            input(type='hidden' name='_method' value='DELETE')
-            button(type='submit') Eliminar
-
-    .cart-summary
-      h2 Resumen
-      a(href='/orders/checkout') Realizar pedido
-      p Total: #{Number(total || 0).toFixed(2)} €
-
-      form(action='/cart/clear' method='POST')
-        input(type='hidden' name='_method' value='DELETE')
-        button(type='submit') Vaciar carrito
+    .cart-footer
+      a.link-back(href='/products', style='margin-top:0;') ← Seguir comprando
+      a.btn.btn-primary.btn-auto(href='/orders/checkout') Ir al checkout →
+      //- Actualización automática al usar +/− (respeta PUT /cart/update/:id)
+      script.
+        document.querySelectorAll('form[action^="/cart/update/"]').forEach((form) => {
+          const input = form.querySelector('input[name="quantity"]');
+          form.querySelectorAll('button[data-step]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const max = Number(input.max || 99);
+              let v = Number(input.value || 1) + Number(btn.dataset.step);
+              v = Math.max(1, Math.min(max, v));
+              input.value = v;
+              form.submit();
+            });
+          });
+          input.addEventListener('change', () => form.submit());
+        });
