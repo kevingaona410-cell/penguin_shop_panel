@@ -1,0 +1,70 @@
+doctype html
+html(lang='es')
+    head
+        meta(charset='UTF-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1.0')
+        link(rel='stylesheet', href='/css/styles.css')
+        title Iniciar sesión | Penguin Shop
+
+    body.login-page
+        main.login-layout
+            section.login-panel(aria-labelledby='login-title')
+                a.login-brand(href='/login')
+                    span.brand-mark 🐧
+                    span
+                        strong Penguin Shop
+                        small Panel de Paula
+
+                .login-copy
+                    p.eyebrow Acceso administrativo
+                    h1#login-title Iniciar sesión
+                    p Introduce tus credenciales para entrar al panel de gestión.
+
+                if error
+                    p.alert.alert-error(role='alert')= error
+
+                form.login-form(action='/login' method='POST')
+                    input(
+                        type='hidden'
+                        name='_csrf'
+                        value=csrfToken
+                    )
+
+                    div.form-field
+                        label(for='username') Usuario
+                        input#username(
+                            type='text'
+                            name='username'
+                            value=username || ''
+                            required
+                            autocomplete='username'
+                            placeholder='Tu usuario'
+                        )
+
+                    div.form-field
+                        label(for='password') Contraseña
+                        input#password(
+                            type='password'
+                            name='password'
+                            required
+                            autocomplete='current-password'
+                            placeholder='Tu contraseña'
+                        )
+
+                    button.button.button-primary(type='submit') Entrar al panel
+                p.login-note Acceso protegido para el equipo de Penguin Shop
+
+            aside.login-aside
+                p.eyebrow Operaciones diarias
+                h2 Todo el panel, en un solo lugar.
+                p Consulta el inventario, revisa pedidos y actualiza su estado desde una interfaz clara y ordenada.
+                ul.feature-list
+                    li
+                        span.feature-icon 01
+                        span Inventario actualizado
+                    li
+                        span.feature-icon 02
+                        span Pedidos bajo control
+                    li
+                        span.feature-icon 03
+                        span Gestión sencilla

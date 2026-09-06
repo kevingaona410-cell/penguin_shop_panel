@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  section.page-heading
+    .heading-copy
+      p.eyebrow Centro de operaciones
+      h1 Panel de administración
+      p Supervisa el catálogo y el estado de los pedidos desde un mismo espacio.
+
+  section.dashboard-grid(aria-label='Secciones del panel')
+    a.dashboard-card.dashboard-card-products(href='/admin/products')
+      span.card-kicker Catálogo
+      span.dashboard-icon ◆
+      h2 Productos
+      p Consulta, crea y actualiza los artículos disponibles en la tienda.
+      span.card-link Ver productos →
+
+    a.dashboard-card.dashboard-card-orders(href='/admin/orders')
+      span.card-kicker Operaciones
+      span.dashboard-icon ◎
+      h2 Pedidos
+      p Revisa cada pedido y acompáñalo hasta su entrega.
+      span.card-link Ver pedidos →

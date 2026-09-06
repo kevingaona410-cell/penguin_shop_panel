@@ -1,0 +1,41 @@
+extends ../layout
+
+block content
+  .detail-back
+    a.text-link(href='/admin/products') ← Volver al catálogo
+
+  article.detail-card
+    .detail-hero
+      if product.imageUrl
+        img.product-image(src=product.imageUrl alt=`Imagen de ${product.name}`)
+      else
+        .product-image.product-image-placeholder ◆
+      .detail-title
+        span.eyebrow Producto
+        h1= product.name
+        span.status-badge(class=product.isActive ? 'status-active' : 'status-inactive')= product.isActive ? 'Activo' : 'Inactivo'
+
+    .detail-body
+      section.detail-description
+        h2 Descripción
+        p= product.description
+
+      dl.detail-stats
+        div
+          dt Categoría
+          dd= product.category === 'fish' ? 'Pescado' : product.category === 'ice' ? 'Hielo' : product.category === 'clothing' ? 'Ropa' : 'Accesorios'
+        div
+          dt Precio
+          dd= `${Number(product.price || 0).toFixed(2)} €`
+        div
+          dt Stock
+          dd= product.stock
+        div
+          dt Creado
+          dd= product.createdAt ? new Date(product.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'
+
+      .detail-actions
+        a.button.button-secondary(href=`/admin/products/${product._id}/edit`) Editar producto
+        form(action=`/admin/products/${product._id}?_method=DELETE` method='POST')
+          input(type='hidden' name='_csrf' value=csrfToken)
+          button.button.button-danger(type='submit') Eliminar producto

@@ -1,0 +1,93 @@
+extends ../layout
+
+block content
+  .detail-back
+    a.text-link(href='/admin/orders') ← Volver a pedidos
+
+  section.page-heading.page-heading-row
+    .heading-copy
+      p.eyebrow Detalle de pedido
+      h1 Pedido ##{String(order._id).slice(-6)}
+      p Revisa la información del cliente y actualiza el progreso del pedido.
+    span.status-badge(class=`status-${order.status || 'unknown'}`)
+      case order.status
+        when 'pending'
+          | Pendiente
+        when 'preparing'
+          | Preparando
+        when 'shipped'
+          | Enviado
+        when 'delivered'
+          | Entregado
+        when 'cancelled'
+          | Cancelado
+        default
+          = order.status || 'Sin estado'
+
+  .order-layout
+    article.detail-card
+      .detail-body
+        .section-heading
+          h2 Información del cliente
+        dl.detail-stats.detail-stats-wide
+          div
+            dt Cliente
+            dd= order.customerName
+          div
+            dt Dirección de entrega
+            dd= order.deliveryAddress
+          div
+            dt Creado
+            dd= order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'
+          div
+            dt Última actualización
+            dd= order.updatedAt ? new Date(order.updatedAt).toLocaleDateString('es-ES') : 'Sin fecha'
+
+        .section-heading
+          h2 Productos del pedido
+        if !order.items || order.items.length === 0
+          p.muted El pedido no contiene productos.
+        else
+          .table-wrap
+            table.data-table
+              thead
+                tr
+                  th Producto
+                  th Precio unitario
+                  th Cantidad
+                  th Subtotal
+              tbody
+                each item in order.items
+                  tr
+                    td
+                      strong= item.productName
+                    td.numeric= `${Number(item.unitPrice || 0).toFixed(2)} €`
+                    td.numeric= item.quantity
+                    td.numeric= `${Number(item.subtotal || 0).toFixed(2)} €`
+
+    aside.order-summary
+      p.eyebrow Resumen
+      span.summary-label Total del pedido
+      strong.summary-total= `${Number(order.total || 0).toFixed(2)} €`
+
+      .order-actions
+        if order.status === 'pending'
+          form(action=`/admin/orders/${order._id}/status?_method=PUT` method='POST')
+            input(type='hidden' name='_csrf' value=csrfToken)
+            input(type='hidden' name='status' value='preparing')
+            button.button.button-primary(type='submit') Marcar como preparando
+        else if order.status === 'preparing'
+          form(action=`/admin/orders/${order._id}/status?_method=PUT` method='POST')
+            input(type='hidden' name='_csrf' value=csrfToken)
+            input(type='hidden' name='status' value='shipped')
+            button.button.button-primary(type='submit') Marcar como enviado
+        else if order.status === 'shipped'
+          form(action=`/admin/orders/${order._id}/status?_method=PUT` method='POST')
+            input(type='hidden' name='_csrf' value=csrfToken)
+            input(type='hidden' name='status' value='delivered')
+            button.button.button-primary(type='submit') Marcar como entregado
+
+        if order.status === 'pending' || order.status === 'preparing'
+          form(action=`/admin/orders/${order._id}/cancel?_method=PUT` method='POST')
+            input(type='hidden' name='_csrf' value=csrfToken)
+            button.button.button-danger(type='submit') Cancelar pedido

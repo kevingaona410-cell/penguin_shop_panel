@@ -1,0 +1,31 @@
+extends ../layout
+
+block content
+  h1= title
+
+  if products && products.length
+    .product-grid
+      each product in products
+        article.product-card
+          if product.imageUrl
+            img.product-image(src=product.imageUrl alt=product.name)
+          else
+            .product-image.placeholder Imagen no disponible
+
+          h2= product.name
+          p= product.description
+
+          .meta
+            span= product.category === 'fish' ? 'Pescado' : product.category === 'ice' ? 'Hielo' : product.category === 'clothing' ? 'Ropa' : 'Accesorios'
+            span= `${Number(product.price || 0).toFixed(2)} €`
+
+          p Stock: #{product.stock}
+
+          .actions
+            a(href=`/products/${product._id}`) Ver detalle
+            form(action=`/cart/add/${product._id}` method='POST')
+              button(type='submit' disabled=product.stock <= 0)
+                = product.stock > 0 ? 'Añadir al carrito' : 'Sin stock'
+  else
+    p No hay productos disponibles en este momento.
+    a(href='/') Volver al inicio

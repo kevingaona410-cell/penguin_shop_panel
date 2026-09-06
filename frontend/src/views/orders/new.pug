@@ -1,0 +1,30 @@
+extends ../layout
+
+block content
+  h1= title
+
+  form(action='/orders' method='POST')
+    div
+      label(for='customerName') Nombre del cliente
+      input(
+        type='text'
+        id='customerName'
+        name='customerName'
+        required
+        minlength='2'
+        maxlength='100'
+      )
+
+    div
+      label(for='deliveryAddress') Dirección de entrega
+      textarea(
+        id='deliveryAddress'
+        name='deliveryAddress'
+        required
+        minlength='5'
+        maxlength='250'
+      )
+
+    button(type='submit') Continuar
+
+  a(href='/cart') Volver al carrito

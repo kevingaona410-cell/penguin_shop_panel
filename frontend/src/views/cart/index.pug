@@ -1,0 +1,35 @@
+extends ../layout
+
+block content
+  h1= title
+
+  if !items || items.length === 0
+    p Tu carrito está vacío.
+    a(href='/products') Ver productos
+  else
+    .cart-list
+      each item in items
+        article.cart-item
+          h2= item.product.name
+          p Precio unitario: #{Number(item.product.price || 0).toFixed(2)} €
+          p Cantidad: #{item.quantity}
+          p Subtotal: #{Number(item.subtotal || 0).toFixed(2)} €
+
+          form(action=`/cart/update/${item.product._id}` method='POST')
+            input(type='hidden' name='_method' value='PUT')
+            label(for=`quantity-${item.product._id}`) Cantidad
+            input(id=`quantity-${item.product._id}` type='number' name='quantity' value=item.quantity min='1' max=item.product.stock)
+            button(type='submit') Actualizar
+
+          form(action=`/cart/remove/${item.product._id}` method='POST')
+            input(type='hidden' name='_method' value='DELETE')
+            button(type='submit') Eliminar
+
+    .cart-summary
+      h2 Resumen
+      a(href='/orders/checkout') Realizar pedido
+      p Total: #{Number(total || 0).toFixed(2)} €
+
+      form(action='/cart/clear' method='POST')
+        input(type='hidden' name='_method' value='DELETE')
+        button(type='submit') Vaciar carrito
