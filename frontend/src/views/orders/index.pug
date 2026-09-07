@@ -1,18 +1,33 @@
 extends ../layout
 
 block content
-  h1= title
+  h1.page-title= title || 'Mis pedidos'
 
   if !orders || orders.length === 0
-    p Todavía no tienes pedidos.
-    a(href='/products') Ver catálogo
+    .empty
+      span.big 📦
+      p Todavía no tienes pedidos.
+      a.btn.btn-primary.btn-auto(href='/products') Ver catálogo
   else
-    each order in orders
-      article
-        h2 Pedido ##{order._id}
-        p Fecha: #{order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'}
-        p Total: #{Number(order.total || 0).toFixed(2)} €
-        p Estado: #{order.status}
-        a(href=`/orders/${order._id}`) Ver detalle
-
-  a(href='/products') Volver al catálogo
+    .table-wrap
+      table.table
+        thead
+          tr
+            th ID del pedido
+            th Fecha
+            th Total
+            th Estado
+            th Acciones
+        tbody
+          each order in orders
+            - const st = order.status
+            - const stLabel = st === 'pending' ? 'Pendiente' : st === 'preparing' ? 'En preparación' : st === 'shipped' ? 'Enviado' : st === 'delivered' ? 'Entregado' : 'Cancelado'
+            tr
+              td(data-label='ID del pedido')
+                code= order._id
+              td(data-label='Fecha')= order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES') : 'Sin fecha'
+              td(data-label='Total')= `${Number(order.total || 0).toFixed(2).replace('.', ',')} €`
+              td(data-label='Estado')
+                span.badge(class=st)= stLabel
+              td(data-label='Acciones')
+                a.btn.btn-ghost.btn-auto(href=`/orders/${order._id}`, style='padding:6px 14px; font-size:12px;') Ver detalle

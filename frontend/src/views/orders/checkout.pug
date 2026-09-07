@@ -1,41 +1,48 @@
 extends ../layout
 
 block content
-    h1= title
+  h1.page-title= title || 'Revisar pedido'
+  p.page-sub Revisa tus datos antes de confirmar.
 
-    h2 Resumen del pedido
+  h2.section-title Datos del cliente
+  form(action='/orders', method='POST')
+    .form-grid
+      .field
+        label(for='customerName') Nombre
+        input#customerName(type='text', name='customerName', placeholder='Juan Pérez', required, minlength='2', maxlength='100', value=(typeof customerName !== 'undefined' ? customerName : ''))
+      .field
+        label(for='deliveryAddress') Dirección de entrega
+        input#deliveryAddress(type='text', name='deliveryAddress', placeholder='Calle del Sol 123, Madrid', required, minlength='5', maxlength='250', value=(typeof deliveryAddress !== 'undefined' ? deliveryAddress : ''))
 
-    each item in items
-        article
-            h3= item.product.name
-            p Precio: #{Number(item.product.price).toFixed(2)} €
-            p Cantidad: #{item.quantity}
-            p Subtotal: #{Number(item.subtotal).toFixed(2)} €
+    h2.section-title Productos
+    .table-wrap
+      table.table
+        thead
+          tr
+            th Producto
+            th Cantidad
+            th Precio unitario
+            th Subtotal
+        tbody
+          each item in items
+            tr
+              td(data-label='Producto')
+                .cell-product
+                  span.mini
+                    if item.product.imageUrl
+                      img(src=item.product.imageUrl, alt=item.product.name)
+                    else
+                      | 🐧
+                  span= item.product.name
+              td(data-label='Cantidad')= item.quantity
+              td(data-label='Precio unitario')= `${Number(item.product.price).toFixed(2).replace('.', ',')} €`
+              td(data-label='Subtotal')= `${Number(item.subtotal).toFixed(2).replace('.', ',')} €`
 
-    h2 Total: #{Number(total).toFixed(2)} €
+    .row-between.mt
+      strong Total
+      strong.total-line
+        span.amount= `${Number(total).toFixed(2).replace('.', ',')} €`
 
-    form(action='/orders' method='POST')
-        div
-            label(for='customerName') Nombre del cliente
-            input(
-                type='text'
-                id='customerName'
-                name='customerName'
-                required
-                minlength='2'
-                maxlength='100'
-            )
-
-        div
-            label(for='deliveryAddress') Dirección de entrega
-            textarea(
-                id='deliveryAddress'
-                name='deliveryAddress'
-                required
-                minlength='5'
-                maxlength='250'
-            )
-
-        button(type='submit') Confirmar pedido
-
-    a(href='/cart') Volver al carrito
+    .cart-footer
+      a.link-back(href='/cart', style='margin-top:0;') ← Volver al carrito
+      button.btn.btn-primary.btn-auto(type='submit') Confirmar pedido

@@ -1,10 +1,28 @@
 extends layout
 
 block content
-  h1= title || 'Penguin Shop'
+  section.hero
+    .hero-copy
+      h1 Todo lo que necesitas para los amantes de los pingüinos
+      p Productos únicos, de alta calidad y con la magia del mundo antártico.
+      a.btn.btn-primary.btn-auto(href='/products') Ver productos
+    .hero-art(aria-hidden='true')
+      svg.ice(viewBox='0 0 600 160', preserveAspectRatio='none')
+        path(d='M0,90 L80,30 L160,80 L250,20 L330,75 L420,35 L500,80 L560,45 L600,70 L600,160 L0,160 Z', fill='#eaf6fe')
+        path(d='M0,110 L120,70 L240,105 L360,75 L480,105 L600,80 L600,160 L0,160 Z', fill='#ffffff', opacity='.85')
+      span.big-penguin 🐧
 
-  p Bienvenido a la tienda. Explora nuestro catálogo y gestiona tu carrito.
-
-  nav
-    a(href='/products') Ver productos
-    a(href='/cart') Ver carrito
+  h2.section-title Categorías destacadas
+  .cat-grid
+    a.cat-card(href='/products?category=accessories')
+      span.emoji 🧸
+      span Peluches
+    a.cat-card(href='/products?category=accessories')
+      span.emoji ☕
+      span Accesorios
+    a.cat-card(href='/products?category=clothing')
+      span.emoji 🧥
+      span Ropa
+    a.cat-card(href='/products')
+      span.emoji 🎁
+      span Regalos

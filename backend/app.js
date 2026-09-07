@@ -56,6 +56,7 @@ app.use((req, res, next) => {
             username: req.session.username
         }
         : null;
+    res.locals.currentPath = req.path;
 
     next();
 });
