@@ -33,12 +33,19 @@ block content
                   span= item.product.name
               td(data-label='Precio unitario')= `${unit} €`
               td(data-label='Cantidad')
-                form(action=`/cart/update/${item.product._id}`, method='POST', style='display:inline;')
-                  input(type='hidden', name='_method', value='PUT')
-                  span.qty
-                    button(type='button', data-step='-1', aria-label='Disminuir cantidad') −
+                .qty
+                  form(action=`/cart/update/${item.product._id}`, method='POST', style='display:inline;')
+                    input(type='hidden', name='_method', value='PUT')
+                    input(type='hidden', name='quantity', value=item.quantity - 1)
+                    button(type='submit', aria-label='Disminuir cantidad', disabled=item.quantity <= 1) −
+                  form(action=`/cart/update/${item.product._id}`, method='POST', style='display:inline;')
+                    input(type='hidden', name='_method', value='PUT')
                     input(type='number', name='quantity', value=item.quantity, min='1', max=item.product.stock, aria-label='Cantidad')
-                    button(type='button', data-step='1', aria-label='Aumentar cantidad') +
+                    button(type='submit', aria-label='Actualizar cantidad') ✓
+                  form(action=`/cart/update/${item.product._id}`, method='POST', style='display:inline;')
+                    input(type='hidden', name='_method', value='PUT')
+                    input(type='hidden', name='quantity', value=item.quantity + 1)
+                    button(type='submit', aria-label='Aumentar cantidad', disabled=item.quantity >= item.product.stock) +
               td(data-label='Subtotal')= `${sub} €`
               td(data-label='Acciones')
                 form(action=`/cart/remove/${item.product._id}`, method='POST', style='display:inline;')
@@ -54,18 +61,3 @@ block content
     .cart-footer
       a.link-back(href='/products', style='margin-top:0;') ← Seguir comprando
       a.btn.btn-primary.btn-auto(href='/orders/checkout') Ir al checkout →
-      //- Actualización automática al usar +/− (respeta PUT /cart/update/:id)
-      script.
-        document.querySelectorAll('form[action^="/cart/update/"]').forEach((form) => {
-          const input = form.querySelector('input[name="quantity"]');
-          form.querySelectorAll('button[data-step]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-              const max = Number(input.max || 99);
-              let v = Number(input.value || 1) + Number(btn.dataset.step);
-              v = Math.max(1, Math.min(max, v));
-              input.value = v;
-              form.submit();
-            });
-          });
-          input.addEventListener('change', () => form.submit());
-        });
