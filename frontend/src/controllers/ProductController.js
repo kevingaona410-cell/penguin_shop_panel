@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const Product = require('../models/Product') // Importacion del modelo de producto
 
 const allowedCategories = ['fish', 'ice', 'clothing', 'accessories'];
+const allowedStock = ['out']
 
 function escapeRegex(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -18,9 +19,11 @@ function createNotFound(resource) {
 async function listProducts(req, res, next) {
     try {
         const query = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+        const rawStock = typeof req.query.stock === 'string' ? req.query.stock.trim() : '';
         const category = allowedCategories.includes(req.query.category)
             ? req.query.category
             : '';
+        const stock = allowedStock.includes(rawStock) ? rawStock : '';
         const filter = { isActive: true };
 
         if (query) {
@@ -35,13 +38,18 @@ async function listProducts(req, res, next) {
             filter.category = category;
         }
 
+        if (stock === 'out') {
+            filter.stock = 0
+        }
+
         const products = await Product.find(filter).sort({ createdAt: -1 }).lean();
 
         res.render('products/index', {
             title: 'Productos',
             products,
             query,
-            category
+            category,
+            stock
         });
     } catch (error) {
         next(error);

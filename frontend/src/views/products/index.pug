@@ -14,6 +14,9 @@ block content
       option(value='ice', selected=category === 'ice') Hielo
       option(value='clothing', selected=category === 'clothing') Ropa
       option(value='accessories', selected=category === 'accessories') Accesorios
+    select.select(name="stock", aria-label='Filtrar por Stock')
+      option(value='', selected=!stock) Todo el stock
+      option(value='out', selected=stock === 'out') Sin stock
     button.btn.btn-primary.btn-auto(type='submit') Buscar
 
   if products && products.length
@@ -40,5 +43,5 @@ block content
   else
     .empty
       span.big 🐧
-      p= query || category ? 'No hay productos que coincidan con tu búsqueda.' : 'No hay productos disponibles en este momento.'
+      p= query || category || stock ? 'No hay productos que coincidan con tu búsqueda.' : 'No hay productos disponibles en este momento.'
       a.btn.btn-ghost.btn-auto(href='/') Volver al inicio
