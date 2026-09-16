@@ -31,15 +31,16 @@ async function showOrder(req, res, next) {
     try {
         const { id } = req.params;
 
-        if (order.sessionID !== req.sessionID) { 
-            return next(createNotFound('Pedido'))
-        }
-
+        
         if (!mongoose.isValidObjectId(id)) {
             return next(createNotFound('Pedido'));
         }
-
+        
         const order = await Order.findById(id).lean();
+        
+        if (order.sessionID !== req.sessionID) { 
+            return next(createNotFound('Pedido'))
+        }
 
         if (!order) {
             return next(createNotFound('Pedido'));
@@ -159,22 +160,22 @@ async function cancelOrder(req, res, next) {
     try {
         const { id } = req.params;
 
+        if (!mongoose.isValidObjectId(id)) {
+            return next(createNotFound('Pedido'));
+        }
+        
+        const order = await Order.findById(id);
+        
         if (order.sessionID !== req.sessionID) { 
             return next(createNotFound('Pedido'))
         }
 
-        if (!mongoose.isValidObjectId(id)) {
-            return next(createNotFound('Pedido'));
-        }
-
-        const order = await Order.findById(id);
-
         if (!order) {
             return next(createNotFound('Pedido'));
         }
-
+        
         const cancellableStatuses = ['pending', 'preparing'];
-
+        
         if (!cancellableStatuses.includes(order.status)) {
             const error = new Error(
                 'El pedido no puede ser cancelado en su estado actual'
@@ -182,7 +183,7 @@ async function cancelOrder(req, res, next) {
             error.status = 400;
             return next(error);
         }
-
+        
         order.status = 'cancelled';
         await order.save();
 
