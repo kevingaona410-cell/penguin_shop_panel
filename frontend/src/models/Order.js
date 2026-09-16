@@ -43,6 +43,11 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
     {
+        sessionID:{
+            type: String
+          //  required: [true, 'La session del cliente es obligatoria']
+        },
+
         customerName: {
             type: String,
             required: [true, 'El nombre del cliente es obligatorio'],

@@ -14,9 +14,8 @@ function createNotFound(resource) {
 // Ver todos los pedidos
 async function listOrders(req, res, next) {
     try {
-        const orders = await Order.find()
-            .sort({ createdAt: -1 })
-            .lean();
+        const filter = {sessionID: req.sessionID};
+        const orders = await Order.find(filter).lean();
 
         res.render('orders/index', {
             title: 'Mis pedidos',
@@ -31,6 +30,10 @@ async function listOrders(req, res, next) {
 async function showOrder(req, res, next) {
     try {
         const { id } = req.params;
+
+        if (order.sessionID !== req.sessionID) { 
+            return next(createNotFound('Pedido'))
+        }
 
         if (!mongoose.isValidObjectId(id)) {
             return next(createNotFound('Pedido'));
@@ -124,6 +127,7 @@ async function createOrder(req, res, next) {
         }
 
         const order = await Order.create({
+            sessionID: req.sessionID,
             customerName: customerName.trim(),
             deliveryAddress: deliveryAddress.trim(),
             items,
@@ -154,6 +158,10 @@ async function createOrder(req, res, next) {
 async function cancelOrder(req, res, next) {
     try {
         const { id } = req.params;
+
+        if (order.sessionID !== req.sessionID) { 
+            return next(createNotFound('Pedido'))
+        }
 
         if (!mongoose.isValidObjectId(id)) {
             return next(createNotFound('Pedido'));
