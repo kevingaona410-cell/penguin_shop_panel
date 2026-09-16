@@ -38,14 +38,15 @@ async function showOrder(req, res, next) {
         
         const order = await Order.findById(id).lean();
         
-        if (order.sessionID !== req.sessionID) { 
-            return next(createNotFound('Pedido'))
-        }
-
+        
         if (!order) {
             return next(createNotFound('Pedido'));
         }
-
+        
+        if (order.sessionID !== req.sessionID) { 
+            return next(createNotFound('Pedido'))
+        }
+        
         res.render('orders/show', {
             title: 'Pedido',
             order
@@ -165,15 +166,15 @@ async function cancelOrder(req, res, next) {
         }
         
         const order = await Order.findById(id);
-        
-        if (order.sessionID !== req.sessionID) { 
-            return next(createNotFound('Pedido'))
-        }
 
         if (!order) {
             return next(createNotFound('Pedido'));
         }
         
+        if (order.sessionID !== req.sessionID) { 
+            return next(createNotFound('Pedido'))
+        }
+   
         const cancellableStatuses = ['pending', 'preparing'];
         
         if (!cancellableStatuses.includes(order.status)) {
