@@ -44,7 +44,7 @@ async function showOrder(req, res, next) {
         }
         
         if (order.sessionID !== req.sessionID) { 
-            return next(createNotFound('Pedido'))
+            return next(createNotFound('Pedido'));
         }
         
         res.render('orders/show', {
@@ -172,7 +172,7 @@ async function cancelOrder(req, res, next) {
         }
         
         if (order.sessionID !== req.sessionID) { 
-            return next(createNotFound('Pedido'))
+            return next(createNotFound('Pedido'));
         }
    
         const cancellableStatuses = ['pending', 'preparing'];
