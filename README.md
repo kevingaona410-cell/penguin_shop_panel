@@ -208,7 +208,6 @@ Los paquetes incluyen dependencias para pruebas con `supertest` y `mongodb-memor
 ## Limitaciones conocidas
 
 - La tienda pública puede reforzar la protección CSRF en acciones mutables.
-- Los pedidos públicos deberían asociarse más estrictamente a la sesión del usuario.
 - Las imágenes se guardan como URL; la subida de archivos no está implementada.
 
 ## Licencia
