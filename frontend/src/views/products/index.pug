@@ -45,3 +45,23 @@ block content
       span.big 🐧
       p= query || category || stock ? 'No hay productos que coincidan con tu búsqueda.' : 'No hay productos disponibles en este momento.'
       a.btn.btn-ghost.btn-auto(href='/') Volver al inicio
+
+  section.comments
+    h2 Comentarios generales
+
+    form(action='/comments', method='POST')
+      label(for='autor') Tu nombre
+      input#autor(type='text', name='autor')
+
+      label(for='text') Tu comentario
+      textarea#text(name='text', required)
+
+      button.btn.btn-primary(type='submit') Publicar comentario
+
+    if comments && comments.length
+      each comment in comments
+        article.comment
+          strong= comment.autor || 'Anónimo'
+          p= comment.text
+    else
+      p Todavía no hay comentarios.

@@ -8,9 +8,10 @@ const MongoStore = require('connect-mongo').default;
 
 const connectDB = require('./src/config/database'); // Importar DB
 
-const cartRoutes = require('./src/routes/CartRoutes')
-const productRoutes = require('./src/routes/ProductRoutes')
+const cartRoutes = require('./src/routes/CartRoutes');
+const productRoutes = require('./src/routes/ProductRoutes');
 const orderRoutes = require('./src/routes/OrderRoutes');
+const commentRoutes = require('./src/routes/CommentRoutes');
 
 const PORT = process.env.PORT || 3001;
 const app = express(); 
@@ -68,7 +69,7 @@ app.get('/', (req, res) => {
 app.use('/cart', cartRoutes);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
-
+app.use('/comments', commentRoutes);
 async function startServer() {
     try { 
         await connectDB(); 

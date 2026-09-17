@@ -1,6 +1,7 @@
 // Conexion con mongoose para la DB
 const mongoose = require('mongoose')
 const Product = require('../models/Product') // Importacion del modelo de producto
+const Comment = require('../models/Comment') // Importacion del modelo de los comentarios
 
 const allowedCategories = ['fish', 'ice', 'clothing', 'accessories'];
 const allowedStock = ['out']
@@ -43,12 +44,14 @@ async function listProducts(req, res, next) {
         }
 
         const products = await Product.find(filter).sort({ createdAt: -1 }).lean();
+        const comments = await Comment.find().sort({createdAt: -1}).lean();
 
         res.render('products/index', {
             title: 'Productos',
             products,
+            comments,
             query,
-            category,
+            category,   
             stock
         });
     } catch (error) {
